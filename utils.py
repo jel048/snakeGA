@@ -4,9 +4,19 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 import matplotlib.animation as animation
 import numpy as np
+import torch
 import time
 import pandas as pd
 import sys
+
+
+def tensor_to_cpu_numpy(data):
+    if isinstance(data, torch.Tensor):
+        return data.cpu().detach().numpy()  # Move tensor to CPU and convert to NumPy
+    elif isinstance(data, list):  # If it's a list, process each item
+        return [tensor_to_cpu_numpy(i) for i in data]
+    else:
+        return data  # If it's not a tensor or list, return as is
 
 def calculate_discounted_rewards(rewards, discount_factor=0.99):
     """Utility to calculate rewards discounted for

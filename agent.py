@@ -40,19 +40,22 @@ class DQNModel(nn.Module):
                     padding=params.get("padding", 0),
                 )
                 self.layers.append(conv_layer)
-                self.layers.append(getattr(nn, params["activation"].capitalize())())
+                #Activation func:
+                self.layers.append(nn.ReLU())
                 input_shape = (params["filters"],  #update in_channels for the next layer
                                input_shape[1] - params["kernel_size"][0] + 1,  #height
                                input_shape[2] - params["kernel_size"][1] + 1) #width
 
             elif 'Flatten' in layer_name:
                 self.layers.append(nn.Flatten())
+                input_shape = input_shape[0] * input_shape[1] * input_shape[2] *4  # Flattened size
+                print(input_shape)
 
             elif 'Dense' in layer_name:
                 dense_layer = nn.Linear(input_shape[0] * input_shape[1] * input_shape[2] if isinstance(input_shape, tuple) else input_shape, 
                                         params["units"])
                 self.layers.append(dense_layer)
-                self.layers.append(getattr(nn, params["activation"].capitalize())())
+                self.layers.append(nn.ReLU())
 
         # Final output layer for action values
         self.output_layer = nn.Linear(params["units"], n_actions)
@@ -60,15 +63,14 @@ class DQNModel(nn.Module):
     def forward(self, x):
         for layer in self.layers:
             x = layer(x)
+            print(x.shape)
         return self.output_layer(x)
 
 class Agent():
     """Base class for all agents
     This class extends to the following classes
     DeepQLearningAgent
-    HamiltonianCycleAgent
-    BreadthFirstSearchAgent
-
+    
     Attributes
     ----------
     _board_size : int
@@ -295,23 +297,44 @@ class DeepQLearningAgent(Agent):
             self._target_net.to(device)
             self.update_target_net()
 
+   # def _prepare_input(self, board):
+   #     """Reshape input and normalize
+   #     
+   #     Parameters
+   #     ----------
+   #     board : Numpy array
+   #         The board state to process
+#
+   #     Returns
+   #     -------
+   #     board : Numpy array
+   #         Processed and normalized board
+   #     """
+   #     if(board.ndim == 3):
+   #         board = board.reshape((1,) + self._input_shape)
+   #     board = self._normalize_board(board.clone())
+   #     return board.clone()
     def _prepare_input(self, board):
-        """Reshape input and normalize
-        
-        Parameters
-        ----------
-        board : Numpy array
-            The board state to process
+        """Reshape input and normalize. Parameters
+                ----------
+        oard : Tensor
+        The board state to process, in shape [batch_size, height, width, channels]
 
-        Returns
-        -------
-        board : Numpy array
-            Processed and normalized board
-        """
-        if(board.ndim == 3):
-            board = board.reshape((1,) + self._input_shape)
-        board = self._normalize_board(board.copy())
-        return board.copy()
+    Returns
+    -------
+    board : Tensor
+        Processed and normalized board in shape [batch_size, channels, height, width]
+    """
+        if isinstance(board, np.ndarray):
+            board = torch.tensor(board, dtype=torch.float32).to(device)  # Use the correct device
+        
+        if board.ndim == 4:
+        # Change from [batch_size, height, width, channels] to [batch_size, channels, height, width]
+            board = board.permute(0, 3, 1, 2)
+    
+            board = self._normalize_board(board)
+        return board
+
 
     def _get_model_outputs(self, board, model=None):
         """Get action values from the DQN model
@@ -331,13 +354,15 @@ class DeepQLearningAgent(Agent):
         """
         # to correct dimensions and normalize
         board = self._prepare_input(board)
-        board = torch.tensor(board)
         # the default model to use
         if model is None:
             model = self._model
-        model.eval()  #set to evaluation mode
-        with torch.no_grad():  #disable gradient calculations
             model_outputs = model(board)
+        else:
+            
+            model.eval()  #set to evaluation mode
+            with torch.no_grad():  #disable gradient calculations
+                model_outputs = model(board)
 
         return model_outputs
 
@@ -356,7 +381,7 @@ class DeepQLearningAgent(Agent):
         """
         # return board.copy()
         # return((board/128.0 - 1).copy())
-        return board.astype(np.float32)/4.0
+        return board.to(dtype=torch.float32) / 4.0
 
     def move(self, board, legal_moves, value=None):
         """Get the action with maximum Q value
@@ -375,7 +400,11 @@ class DeepQLearningAgent(Agent):
         """
         # use the agent model to make the predictions
         model_outputs = self._get_model_outputs(board, self._model)
-        return np.argmax(np.where(legal_moves==1, model_outputs, -np.inf), axis=1)
+        model_outputs_cpu = model_outputs.cpu().detach().numpy()  # Move to CPU and detach from computation graph
+
+        
+        
+        return np.argmax(np.where(legal_moves == 1, model_outputs_cpu, -np.inf), axis=1)
 
     def _agent_model(self):
         # Load the model config and initialize DQNModel
@@ -512,22 +541,45 @@ class DeepQLearningAgent(Agent):
         next_s = torch.tensor(next_s, dtype=torch.float32).to(device)
         done = torch.tensor(done, dtype=torch.float32).to(device)
         legal_moves = torch.tensor(legal_moves, dtype=torch.float32).to(device)
+        print("r shape: ", r.shape)
+        print("a shape: ", a.shape)
+        print("s shape: ", s.shape)
+        print("next_S shape: ", next_s.shape)
+        print("done shape: ", done.shape)
+        print("legal moves shape: ", legal_moves.shape)
         
         # calculate the discounted reward, and then train accordingly
         current_model = self._target_net if self._use_target_net else self._model
         # Get outputs for next state
         next_model_outputs = self._get_model_outputs(next_s, current_model)
         # our estimate of expexted future discounted reward
+        
         # Calculate discounted reward
         max_next_reward = torch.max(torch.where(legal_moves == 1, next_model_outputs, -torch.inf), dim=1)[0]
+        max_next_reward = max_next_reward.unsqueeze(1)
+        
         discounted_reward = r + (self._gamma * max_next_reward * (1 - done))
+        
         # create the target variable, only the column with action has different value
         target = self._get_model_outputs(s, current_model)
+        
         # we bother only with the difference in reward estimate at the selected action
         target = (1-a)*target + a*discounted_reward
-        # fit
-        loss = self._model.train_on_batch(self._normalize_board(s), target)
-        # loss = round(loss, 5)
+        
+        self._model.train()
+        
+        #Getting action values from the training net, not the target net
+        model_output = self._get_model_outputs(s)
+        # Make sure model_output requires gradients
+        model_output.requires_grad_()
+        
+        # mean huber loss
+        loss = self.loss(model_output, target)
+        # Zero gradients, perform backward pass, and update weights
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
+        
         return loss
 
     def update_target_net(self):
@@ -535,27 +587,31 @@ class DeepQLearningAgent(Agent):
         static for a few iterations to stabilize the other network.
         This should not be updated very frequently
         """
-        if(self._use_target_net):
-            self._target_net.set_weights(self._model.get_weights())
+        if self._use_target_net:
+        #copy the weights from the main model to the target network
+            self._target_net.load_state_dict(self._model.state_dict())
 
     def compare_weights(self):
-        """Simple utility function to heck if the model and target 
-        network have the same weights or not
-        """
-        for i in range(len(self._model.layers)):
-            for j in range(len(self._model.layers[i].weights)):
-                c = (self._model.layers[i].weights[j].numpy() == \
-                     self._target_net.layers[i].weights[j].numpy()).all()
-                print('Layer {:d} Weights {:d} Match : {:d}'.format(i, j, int(c)))
+        """Utility function to check if the model
+        and target network have the same weights or not"""
+        
+        if self._use_target_net:
+            for i, (model_param, target_param) in enumerate(zip(self._model.parameters(), self._target_net.parameters())):
+            # Check if the weights are equal
+                weights_match = torch.equal(model_param, target_param)
+                print(f'Parameter {i} Match: {weights_match}')
+                
+                
 
     def copy_weights_from_agent(self, agent_for_copy):
-        """Update weights between competing agents which can be used
-        in parallel training
-        """
-        assert isinstance(agent_for_copy, self), "Agent type is required for copy"
+        """Update weights between competing agents which can be usedin parallel training"""
+        assert isinstance(agent_for_copy, type(self)), "Agent type is required for copy"
 
-        self._model.set_weights(agent_for_copy._model.get_weights())
-        self._target_net.set_weights(agent_for_copy._model_pred.get_weights())
+        # Copy weights from agent_for_copy's model and target network to this agent's model and target network
+        self._model.load_state_dict(agent_for_copy._model.state_dict())
+        if self._use_target_net:
+            self._target_net.load_state_dict(agent_for_copy._target_net.state_dict())
+
 
 
 

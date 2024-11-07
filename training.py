@@ -10,15 +10,16 @@ from tqdm import tqdm
 from collections import deque
 import pandas as pd
 import time
-from utils import play_game, play_game2
+from utils import play_game, play_game2, tensor_to_cpu_numpy
 from game_environment import Snake, SnakeNumpy
-import tensorflow as tf
-from agent import DeepQLearningAgent, PolicyGradientAgent,\
-                AdvantageActorCriticAgent, mean_huber_loss
+import torch
+from agent import DeepQLearningAgent
+
+
 import json
 
 # some global variables
-tf.random.set_seed(42)
+torch.random.seed()
 version = 'v17.1'
 
 # get training configurations
@@ -109,7 +110,7 @@ for index in tqdm(range(episodes)):
         # model_logs['reward_dev'].append(round(np.std(current_rewards), 2))
         model_logs['length_mean'].append(round(int(current_lengths)/current_games, 2))
         model_logs['games'].append(current_games)
-        model_logs['loss'].append(loss)
+        model_logs['loss'].append(tensor_to_cpu_numpy(loss)) #tensor to cpu/numpy before using pandas
         pd.DataFrame(model_logs)[['iteration', 'reward_mean', 'length_mean', 'games', 'loss']]\
           .to_csv('model_logs/{:s}.csv'.format(version), index=False)
 
