@@ -327,6 +327,9 @@ class DeepQLearningAgent(Agent):
     """
         if isinstance(board, np.ndarray):
             board = torch.tensor(board, dtype=torch.float32).to(device)  # Use the correct device
+            
+        if board.dim() == 3:  #(channels, height, width)
+            board = board.unsqueeze(0)  # Now shape is (1, channels, height, width)
         
         if board.ndim == 4:
         # Change from [batch_size, height, width, channels] to [batch_size, channels, height, width]
@@ -571,7 +574,7 @@ class DeepQLearningAgent(Agent):
         #Getting action values from the training net, not the target net
         model_output = self._get_model_outputs(s)
         # Make sure model_output requires gradients
-        model_output.requires_grad_()
+        #model_output.requires_grad_()
         
         # mean huber loss
         loss = self.loss(model_output, target)

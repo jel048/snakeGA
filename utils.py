@@ -303,7 +303,7 @@ def visualize_game(env, agent, path='images/game_visual.png', debug=False,
         food_count.append(food_count[-1])
         game_images.append(game_images[-1])
     # plot the game
-    if(animation):
+    if(animate):
         fig, axs = plt.subplots(1, 1,
                         figsize=(board_size//2 + 1,board_size//2 + 1))
         anim = animation.FuncAnimation(fig, anim_frames_func,
