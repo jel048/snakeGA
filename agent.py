@@ -42,13 +42,17 @@ class DQNModel(nn.Module):
                 self.layers.append(conv_layer)
                 #Activation func:
                 self.layers.append(nn.ReLU())
-                input_shape = (params["filters"],  #update in_channels for the next layer
+                if params.get("padding") == "same":
+                    input_shape = (params["filters"], input_shape[1],  #height
+                                                    input_shape[2])    #width
+                else:
+                    input_shape = (params["filters"],  #update in_channels for the next layer
                                input_shape[1] - params["kernel_size"][0] + 1,  #height
                                input_shape[2] - params["kernel_size"][1] + 1) #width
 
             elif 'Flatten' in layer_name:
                 self.layers.append(nn.Flatten())
-                input_shape = input_shape[0] * input_shape[1] * input_shape[2] *4  # Flattened size
+                input_shape = input_shape[0] * input_shape[1] * input_shape[2]  # Flattened size
                 print(input_shape)
 
             elif 'Dense' in layer_name:
@@ -297,23 +301,6 @@ class DeepQLearningAgent(Agent):
             self._target_net.to(device)
             self.update_target_net()
 
-   # def _prepare_input(self, board):
-   #     """Reshape input and normalize
-   #     
-   #     Parameters
-   #     ----------
-   #     board : Numpy array
-   #         The board state to process
-#
-   #     Returns
-   #     -------
-   #     board : Numpy array
-   #         Processed and normalized board
-   #     """
-   #     if(board.ndim == 3):
-   #         board = board.reshape((1,) + self._input_shape)
-   #     board = self._normalize_board(board.clone())
-   #     return board.clone()
     def _prepare_input(self, board):
         """Reshape input and normalize. Parameters
                 ----------
@@ -327,9 +314,10 @@ class DeepQLearningAgent(Agent):
     """
         if isinstance(board, np.ndarray):
             board = torch.tensor(board, dtype=torch.float32).to(device)  # Use the correct device
-            
+        
+        #From visualize game- board is sent in as a 3dim tensor, missing batch size - unsqueeze it to 4 dim to be accepted as input by the model    
         if board.dim() == 3:  #(channels, height, width)
-            board = board.unsqueeze(0)  # Now shape is (1, channels, height, width)
+            board = board.unsqueeze(0)  #Now shape is (1, channels, height, width)
         
         if board.ndim == 4:
         # Change from [batch_size, height, width, channels] to [batch_size, channels, height, width]
@@ -357,8 +345,8 @@ class DeepQLearningAgent(Agent):
         """
         # to correct dimensions and normalize
         board = self._prepare_input(board)
-        # the default model to use
-        if model is None:
+        # the model to use
+        if model is None:  #running on active model and not target net - gradients active
             model = self._model
             model_outputs = model(board)
         else:
@@ -572,13 +560,12 @@ class DeepQLearningAgent(Agent):
         self._model.train()
         
         #Getting action values from the training net, not the target net
-        model_output = self._get_model_outputs(s)
-        # Make sure model_output requires gradients
-        #model_output.requires_grad_()
+        model_output = self._get_model_outputs(s)  #Send in with model = none, so that mdoel stays in train mode with active gradients
+
         
         # mean huber loss
         loss = self.loss(model_output, target)
-        # Zero gradients, perform backward pass, and update weights
+        #Zero gradients, backward pass, and update weights
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
