@@ -53,7 +53,6 @@ class DQNModel(nn.Module):
             elif 'Flatten' in layer_name:
                 self.layers.append(nn.Flatten())
                 input_shape = input_shape[0] * input_shape[1] * input_shape[2]  # Flattened size
-                print(input_shape)
 
             elif 'Dense' in layer_name:
                 dense_layer = nn.Linear(input_shape[0] * input_shape[1] * input_shape[2] if isinstance(input_shape, tuple) else input_shape, 
