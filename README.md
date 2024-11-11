@@ -13,6 +13,8 @@ Execute training.py to begin the training process.
 To visualize gameplay results, run game_visualization.py, after setting model version also here.  
 
 
+## Overview
+
 This project implements a Deep Reinforcement Learning agent to play the game of Snake, utilizing Deep Q-Learning with convolutional neural networks. This code is a PyTorch adaptation based on the snake-rl project by [DragonWarrior15](https://github.com/DragonWarrior15/snake-rl). 
 The main goal of the assignment was to convert the DeepQLearningAgent from TensorFlow to Pytorch. 
 Following the changes to this class also led to small changes in other parts of the codebase, to ensure every part is compatible with the new pytorch code.
