@@ -4,7 +4,7 @@
 
 # Runnng Graded assignment 02
 
-## To run the project, follow these steps:  
+### To run the project, follow these steps:  
 
 Clone the GitHub repository and navigate to the main directory.  
 Ensure that all dependencies match those specified in the provided environment.yaml file.  
@@ -22,14 +22,14 @@ Following the changes to this class also led to small changes in other parts of 
 My other goals include training an agent capable of navigating an obstacle-free board and a more challenging board with randomly generated obstacles.
 
 
-## Sample Gameplay  
+# Sample Gameplay  
 Below are sample games from the best-performing models:
 
 ## Version 15 - Obstacle-Free Environment
 Trained in an open environment without obstacles, the version 15 agent demonstrates the agent in a classic Snake game setup.  
 This model is trained with two convolution layers, one with 16 filters [3,3] kernel size, and one with 32 filters and [3,3] kernel size  
 
-Average game rewards and average snake length during training:  
+### Average game rewards and average snake length during training:  
 
 ***
 <img width="600" height="300" src="https://github.com/jel048/snakeGA/blob/master/images/reward_mean_vs_iteration_v15.1.png" alt="model v15.1 reward mean" ><br>
@@ -38,7 +38,7 @@ Average game rewards and average snake length during training:
 ***
 
 
-Sample games from one of the best performing version 15 [agent](..\models\v15.1\model_193500.pth)<br>  
+### Sample games from one of the best performing version 15 [agent](..\models\v15.1\model_193500.pth)<br>  
 
 ***
 <img width="400" height="400" src="https://github.com/jel048/snakeGA/blob/master/images/v15.1.2.gif" alt="model v15.1 agent, gif #2" ><img width="400" height="400" src="https://github.com/jel048/snakeGA/blob/master/images/v15.1.3.gif" alt="model v15.1 agent, gif 3" >
@@ -47,7 +47,7 @@ Sample games from one of the best performing version 15 [agent](..\models\v15.1\
 ## Version 16 - Obstacle-Free Environment, extra CNN layer
 Trained in an open environment without obstacles, but with one more convolution layer than version 15, also this one with 32 filters. The version 16 agent demonstrates the increased learning of an extra layer.
 
-Average game rewards and average snake length during training:
+### Average game rewards and average snake length during training:
 
 ***
 <img width="600" height="300" src="https://github.com/jel048/snakeGA/blob/master/images/reward_mean_vs_iteration_v16.1.png" alt="model v16.1 reward mean" ><br>
@@ -55,7 +55,7 @@ Average game rewards and average snake length during training:
 
 ***
 
-Sample games from one of the best performing version 16 [agent](..\models\v16.1\model_197500.pth)<br>  
+### Sample games from one of the best performing version 16 [agent](..\models\v16.1\model_197500.pth)<br>  
 
 ***
 <img width="400" height="400" src="https://github.com/jel048/snakeGA/blob/master/images/v16.1.1.gif" alt="model v116.1 agent, gif #1" ><img width="400" height="400" src="https://github.com/jel048/snakeGA/blob/master/images/v16.1.3.gif" alt="model v16.1 agent, gif 3" >
@@ -64,7 +64,7 @@ Sample games from one of the best performing version 16 [agent](..\models\v16.1\
 ## Version 17 - Environment with Obstacles
 In this setup, obstacles are randomly generated on the board. Version 17 of the model generalizes well to the complex environment.
 
-Average game rewards and average snake length during training:
+### Average game rewards and average snake length during training:
 
 ***
 <img width="600" height="300" src="https://github.com/jel048/snakeGA/blob/master/images/reward_mean_vs_iteration_v17.1.png" alt="model v17.1 reward mean" ><br>
@@ -72,7 +72,7 @@ Average game rewards and average snake length during training:
 
 ***
 
-Sample games from one of the best performing version 17 [agent](..\models\v17.1\model_193000.pth)<br>  
+### Sample games from one of the best performing version 17 [agent](..\models\v17.1\model_193000.pth)<br>  
 ***
 <img width="400" height="400" src="https://github.com/jel048/snakeGA/blob/master/images/v17.1.3.gif" alt="model v17.1 agent, gif #3" ><img width="400" height="400" src="https://github.com/jel048/snakeGA/blob/master/images/v17.1.2.gif" alt="model v17.1 agent, gif 2" >
 ***

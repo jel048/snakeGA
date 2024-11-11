@@ -267,22 +267,19 @@ class Agent():
 class DeepQLearningAgent(Agent):
     """This agent learns the game via Q learning
     model outputs everywhere refers to Q values
-    This class extends to the following classes
-    PolicyGradientAgent
-    AdvantageActorCriticAgent
-
+    
     Attributes
     ----------
-    _model : TensorFlow Graph
+    _model : Pytorch Graph
         Stores the graph of the DQN model
-    _target_net : TensorFlow Graph
+    _target_net : Pytorch Graph
         Stores the target network graph of the DQN model
     """
     def __init__(self, board_size=10, frames=4, buffer_size=10000,
                  gamma=0.99, n_actions=3, use_target_net=True,
                  version=''):
         """Initializer for DQN agent, arguments are same as Agent class
-        except use_target_net is by default True and we call and additional
+        except use_target_net is by default True and we call an additional
         reset models method to initialize the DQN networks
         """
         Agent.__init__(self, board_size=board_size, frames=frames, buffer_size=buffer_size,
@@ -303,7 +300,7 @@ class DeepQLearningAgent(Agent):
     def _prepare_input(self, board):
         """Reshape input and normalize. Parameters
                 ----------
-        oard : Tensor
+        board : Tensor
         The board state to process, in shape [batch_size, height, width, channels]
 
     Returns
@@ -315,8 +312,8 @@ class DeepQLearningAgent(Agent):
             board = torch.tensor(board, dtype=torch.float32).to(device)  # Use the correct device
         
         #From visualize game- board is sent in as a 3dim tensor, missing batch size - unsqueeze it to 4 dim to be accepted as input by the model    
-        if board.dim() == 3:  #(channels, height, width)
-            board = board.unsqueeze(0)  #Now shape is (1, channels, height, width)
+        if board.dim() == 3:  #(height, width, channels)
+            board = board.unsqueeze(0)  #Now shape is (1, height, width, channels)
         
         if board.ndim == 4:
         # Change from [batch_size, height, width, channels] to [batch_size, channels, height, width]
@@ -331,14 +328,14 @@ class DeepQLearningAgent(Agent):
 
         Parameters
         ----------
-        board : Numpy array
+        board :
             The board state for which to predict action values
-        model : TensorFlow Graph, optional
+        model : 
             The graph to use for prediction, model or target network
 
         Returns
         -------
-        model_outputs : Numpy array
+        model_outputs :
             Predicted model outputs on board, 
             of shape board.shape[0] * num actions
         """
@@ -361,12 +358,12 @@ class DeepQLearningAgent(Agent):
         
         Parameters
         ----------
-        board : Numpy array
+        board : 
             The board state to normalize
 
         Returns
         -------
-        board : Numpy array
+        board : 
             The copy of board state after normalization
         """
         # return board.copy()
@@ -378,7 +375,7 @@ class DeepQLearningAgent(Agent):
         
         Parameters
         ----------
-        board : Numpy array
+        board : 
             The board state on which to calculate best action
         value : None, optional
             Kept for consistency with other agent classes
@@ -531,12 +528,13 @@ class DeepQLearningAgent(Agent):
         next_s = torch.tensor(next_s, dtype=torch.float32).to(device)
         done = torch.tensor(done, dtype=torch.float32).to(device)
         legal_moves = torch.tensor(legal_moves, dtype=torch.float32).to(device)
-        print("r shape: ", r.shape)
-        print("a shape: ", a.shape)
-        print("s shape: ", s.shape)
-        print("next_S shape: ", next_s.shape)
-        print("done shape: ", done.shape)
-        print("legal moves shape: ", legal_moves.shape)
+        
+        #print("r shape: ", r.shape)     Used for debugging
+        #print("a shape: ", a.shape)
+        #print("s shape: ", s.shape)
+        #print("next_S shape: ", next_s.shape)
+        #print("done shape: ", done.shape)
+        #print("legal moves shape: ", legal_moves.shape)
         
         # calculate the discounted reward, and then train accordingly
         current_model = self._target_net if self._use_target_net else self._model
