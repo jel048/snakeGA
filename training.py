@@ -20,7 +20,7 @@ import json
 
 # some global variables
 torch.random.seed()
-version = 'v15.1'
+version = 'v16.1'
 
 # get training configurations
 with open('model_config/{:s}.json'.format(version), 'r') as f:

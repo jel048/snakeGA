@@ -20,6 +20,12 @@
             "activation":"relu",
             "data_format":"channels_last"
         },
+        "Conv2D_2":{
+            "filters":32,
+            "kernel_size":[3,3],
+            "activation":"relu",
+            "data_format":"channels_last"
+        },
         "Flatten":{
 
         },

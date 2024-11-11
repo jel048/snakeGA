@@ -9,7 +9,7 @@ import json
 # import keras.backend as K
 
 # some global variables
-version = 'v15.1'
+version = 'v16.1'
 
 with open('model_config/{:s}.json'.format(version), 'r') as f:
     m = json.loads(f.read())
@@ -20,7 +20,7 @@ with open('model_config/{:s}.json'.format(version), 'r') as f:
     n_actions = m['n_actions']
     obstacles = bool(m['obstacles'])
 
-iteration_list = [193500]
+iteration_list = [197500]
 max_time_limit = 398
 
 # setup the environment

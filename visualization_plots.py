@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-version = 'v17.1'
+version = 'v16.1'
 
 #Load the CSV file into a DataFrame
 df =pd.read_csv(f'model_logs/{version}.csv')
