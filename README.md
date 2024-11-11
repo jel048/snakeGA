@@ -32,7 +32,8 @@ This model is trained with two convolution layers, one with 16 filters [3,3] ker
 Average game rewards and average snake length during training:  
 
 ***
-<img width="400" height="200" src="https://github.com/jel048/snakeGA/blob/master/images/reward_mean_vs_iteration_v15.1.png" alt="model v15.1 reward mean" ><img width="400" height="200" src="https://github.com/jel048/snakeGA/blob/master/images/length_mean_vs_iteration_v15.1.png" alt="model v15.1 length mean >
+<img width="500" height="300" src="https://github.com/jel048/snakeGA/blob/master/images/reward_mean_vs_iteration_v15.1.png" alt="model v15.1 reward mean" ><br>
+<img width="500" height="300" src="https://github.com/jel048/snakeGA/blob/master/images/length_mean_vs_iteration_v15.1.png" alt="model v15.1 length mean >
 
 ***
 
@@ -49,7 +50,8 @@ Trained in an open environment without obstacles, but with one more convolution 
 Average game rewards and average snake length during training:
 
 ***
-<img width="400" height="200" src="https://github.com/jel048/snakeGA/blob/master/images/reward_mean_vs_iteration_v16.1.png" alt="model v16.1 reward mean" ><img width="400" height="200" src="https://github.com/jel048/snakeGA/blob/master/images/length_mean_vs_iteration_v16.1.png" alt="model v16.1 length mean >
+<img width="500" height="300" src="https://github.com/jel048/snakeGA/blob/master/images/reward_mean_vs_iteration_v16.1.png" alt="model v16.1 reward mean" ><br>
+<img width="500" height="300" src="https://github.com/jel048/snakeGA/blob/master/images/length_mean_vs_iteration_v16.1.png" alt="model v16.1 length mean >
 
 ***
 
@@ -65,7 +67,8 @@ In this setup, obstacles are randomly generated on the board. Version 17 of the 
 Average game rewards and average snake length during training:
 
 ***
-<img width="400" height="200" src="https://github.com/jel048/snakeGA/blob/master/images/reward_mean_vs_iteration_v17.1.png" alt="model v17.1 reward mean" ><img width="400" height="200" src="https://github.com/jel048/snakeGA/blob/master/images/length_mean_vs_iteration_v17.1.png" alt="model v17.1 length mean >
+<img width="500" height="300" src="https://github.com/jel048/snakeGA/blob/master/images/reward_mean_vs_iteration_v17.1.png" alt="model v17.1 reward mean" ><br>
+<img width="500" height="300" src="https://github.com/jel048/snakeGA/blob/master/images/length_mean_vs_iteration_v17.1.png" alt="model v17.1 length mean >
 
 ***
 
